@@ -43,13 +43,13 @@ flowchart LR
 
   %% ===== Online / Serving =====
   subgraph ONLINE[Online / Serving]
-    B1[Brief Intake (year, budget, genres, roles)]
-    C1[As-of Aggregates (using train-era bins)]
-    C2[Candidate Builder (filters from brief)]
-    F2[Feature Builder (serve): same transforms]
-    SC[Scoring Service (predict_proba)]
-    R1[Rules & Constraints (BFD/cadence/diversity)]
-    SL[Slate Assembly (Top-N)]
+    B1[Brief Intake - year, budget, genres, roles]
+    C1[As-of Aggregates - using train-era bins]
+    C2[Candidate Builder - filters from brief]
+    F2[Feature Builder - serve: same transforms]
+    SC[Scoring Service - predict_proba]
+    R1[Rules & Constraints - BFD/cadence/diversity]
+    SL[Slate Assembly - Top-N]
     EX[Reason Codes & Plots]
   end
 
