@@ -40,7 +40,7 @@ flowchart LR
     Q1[Budget Bins<br/>(fit on train only)]
     M1[Train Classifier]
     V1[Holdout Eval<br/>(AUC + flip-guard)]
-    AR1[Artifacts:<br/>model.pkl,<br/>feature_cols.json,<br/>budget_bins.json,<br/>metrics.json]
+    AR1[Artifacts]
   end
 
   %% ==== Online / Serving ====
