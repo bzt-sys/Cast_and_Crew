@@ -24,48 +24,45 @@ engaging with audiences more successfully per project.
 ## 2) System Architecture
 ```mermaid 
 flowchart LR
-  %% ==== Sources ====
-  subgraph SOURCES[Data Sources]
-    A1[Film–Actor Long Table<br/>(title_id, actor, year, budget, bill_order, genre_* )]
-    A2[Director Metadata<br/>(title_id → director)]
-    A3[Resonance Labels<br/>(train-era targets)]
-  end
+  %% ===== Sources =====
+  A1["Film–Actor Long Table (title_id, actor, year, budget, bill_order, genre_*)"]
+  A2["Director Metadata (title_id → director)"]
+  A3["Resonance Labels (train era targets)"]
 
-  %% ==== Offline / Training ====
+  %% ===== Offline / Training =====
   subgraph OFFLINE[Offline / Training]
-    S1[Schema & QC<br/>(coerce dtypes, assert cols)]
-    J1[Join Director<br/>(optional merge)]
-    F1[Feature Builder (train)<br/>ATR3/DTR3, BFD, ReleaseDensity,<br/>GenreAff, Year sin/cos, BillOrder]
-    T1{Temporal Split<br/>TRAIN_CUTOFF_YEAR}
-    Q1[Budget Bins<br/>(fit on train only)]
+    S1[Schema & QC]
+    J1[Join Director (optional)]
+    F1[Feature Builder (train): ATR3/DTR3, BFD, Release Density, Genre Aff, Year sin/cos, Bill Order]
+    T1{Temporal Split (TRAIN_CUTOFF_YEAR)}
+    Q1[Budget Bins (fit on train only)]
     M1[Train Classifier]
-    V1[Holdout Eval<br/>(AUC + flip-guard)]
+    V1[Holdout Eval (AUC + flip guard)]
     AR1[Artifacts]
   end
 
-  %% ==== Online / Serving ====
+  %% ===== Online / Serving =====
   subgraph ONLINE[Online / Serving]
-    B1[Brief Intake<br/>(year, budget, genres, roles)]
-    C1[As-of Aggregates<br/>(using train-era bins)]
-    C2[Candidate Builder<br/>(brief filters)]
-    F2[Feature Builder (serve)<br/>(same transforms,<br/>train-era bins)]
-    SC[Scoring Service<br/>(predict_proba)]
-    R1[Rules & Constraints<br/>(BFD penalties,<br/>cadence bounds,<br/>diversity)]
-    SL[Slate Assembly<br/>(top-N)]
+    B1[Brief Intake (year, budget, genres, roles)]
+    C1[As-of Aggregates (using train-era bins)]
+    C2[Candidate Builder (filters from brief)]
+    F2[Feature Builder (serve): same transforms]
+    SC[Scoring Service (predict_proba)]
+    R1[Rules & Constraints (BFD/cadence/diversity)]
+    SL[Slate Assembly (Top-N)]
     EX[Reason Codes & Plots]
   end
 
-  %% ==== Edges ====
+  %% ===== Edges =====
   A1 --> S1 --> J1 --> F1 --> T1
   A2 --> J1
   A3 --> F1
   T1 -->|train| Q1 --> M1 --> V1 --> AR1
   T1 -->|holdout| V1
-
   B1 --> C1
   AR1 --> C1
   AR1 --> F2
-  C1 --> C2 --> F2 --> SC --> R1 --> SL --> EX ```
+  C1 --> C2 --> F2 --> SC --> R1 --> SL --> EX```
 
 ### TRAIN
 fa = load_long_table()
