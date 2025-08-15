@@ -1,4 +1,4 @@
-s# Cast & Crew Resonance Recommender
+# Cast & Crew Resonance Recommender
 
 Built in 3 days as a rapid exploration of an actor/director slate recommender. I deliberately scoped this as a speed run to study how far a single developer can get with an LLM coding assistant. Expect rough edges and open TODOs; see Limitations & Next steps.
 LLM collaboration statement
