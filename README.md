@@ -23,65 +23,69 @@ engaging with audiences more successfully per project.
 
 ## 2) System Architecture
 
-flowchart TB
-  %% =============== INPUTS ===============
-  subgraph Inputs
-    BRIEF[[Project Brief\n(year, budget, genres, bill_order)]]
-    DATA[(fa long table)]
+flowchart LR
+  %% ==== Sources ====
+  subgraph SOURCES[Data Sources]
+    A1[Film–Actor Long Table<br/>(title_id, actor, year, budget, bill_order, genre_* )]
+    A2[Director Metadata<br/>(title_id → director)]
+    A3[Resonance Labels<br/>(train-era targets)]
   end
 
-  %% =============== TRAINING ===============
-  subgraph Training Pipeline
-    A1[Leakage-safe labels\nTop quartile resonance\ncomputed on TRAIN years only]
-    A2[Feature engineering\natr3, dtr3, release_density,\ngenre_*_aff, year_sin/cos,\nBUDGET_BIN_EDGES, bfd]
-    A3[Temporal split\nby TRAIN_CUTOFF_YEAR]
-    A4[Actor head model\n(HGB/RF)]
-    A5[Director head model\n(HGB)]
-    A6[Calibration fit\nPlatt on FEATURES (prefit),\nIsotonic on base probs]
-    A7[Cycle head fit\nResidual r = y - p_base\n~ year_sin/cos]
+  %% ==== Offline / Training ====
+  subgraph OFFLINE[Offline / Training]
+    S1[Schema & QC<br/>(coerce dtypes, assert cols)]
+    J1[Join Director<br/>(optional merge)]
+    F1[Feature Builder (train)<br/>ATR3/DTR3, BFD, ReleaseDensity,<br/>GenreAff, Year sin/cos, BillOrder]
+    T1{Temporal Split<br/>TRAIN_CUTOFF_YEAR}
+    Q1[Budget Bins<br/>(fit on train only)]
+    M1[Train Classifier]
+    V1[Holdout Eval<br/>(AUC + flip-guard)]
+    AR1[Artifacts:<br/>model.pkl,<br/>feature_cols.json,<br/>budget_bins.json,<br/>metrics.json]
   end
 
-  %% =============== SERVING ===============
-  subgraph Serving (Recommender)
-    S1[Build candidate matrix (as-of year)\nactor means (stable_feats),\ntrailing aggregates, film features\n— enforce feature contract]
-    S2[Score base probs (p_base)\nusing use_model]
-    S3[Cycle blend to ranking score\np_rank = blend(p_base, uplift)]
-    S4[Calibrated probs for display only\np_cal = isotonic(p_base) or Platt(X)]
-    S5[Unsung alternates\nkNN on actor_feat (cosine)]
-    S6[Reason codes\nperturb features → Δprob]
-    S7[Optional synergy\nadjust actor p via chosen director]
+  %% ==== Online / Serving ====
+  subgraph ONLINE[Online / Serving]
+    B1[Brief Intake<br/>(year, budget, genres, roles)]
+    C1[As-of Aggregates<br/>(using train-era bins)]
+    C2[Candidate Builder<br/>(brief filters)]
+    F2[Feature Builder (serve)<br/>(same transforms,<br/>train-era bins)]
+    SC[Scoring Service<br/>(predict_proba)]
+    R1[Rules & Constraints<br/>(BFD penalties,<br/>cadence bounds,<br/>diversity)]
+    SL[Slate Assembly<br/>(top-N)]
+    EX[Reason Codes & Plots]
   end
 
-  %% =============== OUTPUTS ===============
-  subgraph Outputs
-    O1[[Actor slate CSV\nTop-N with p_high, p_base, p_cal]]
-    O2[[Alternates CSV]]
-    O3[[Reason-codes CSV + plots]]
-    O4[[Manifest JSON\n(params, timestamps, flags)]]
-  end
+  %% ==== Edges ====
+  A1 --> S1 --> J1 --> F1 --> T1
+  A2 --> J1
+  A3 --> F1
+  T1 -->|train| Q1 --> M1 --> V1 --> AR1
+  T1 -->|holdout| V1
 
-  %% Connections
-  BRIEF --> S1
-  DATA --> A1 --> A2 --> A3 --> A4
-  A3 --> A5
-  A3 --> A6
-  A3 --> A7
-  DATA --> S1
-  A4 --> S2
-  A7 --> S3
-  S2 --> S3 --> S4
-  S2 --> S5
-  S2 --> S6
-  S3 --> O1
-  S5 --> O2
-  S6 --> O3
-  S4 --> O1
-  S7 --> O1
-  A5 --> S7
+  B1 --> C1
+  AR1 --> C1
+  AR1 --> F2
+  C1 --> C2 --> F2 --> SC --> R1 --> SL --> EX
 
-```
+### TRAIN
+fa = load_long_table()
+fa = attach_director_if_available(fa)
+fa = build_features(fa, shifted=True)                 # ATR3, DTR3, BFD, release_density, genres, year sin/cos, bill_order
+train, holdout = temporal_split(fa, cutoff=TRAIN_CUTOFF_YEAR)
+budget_bins = fit_budget_bins(train)
+clf = fit_classifier(train[feature_cols], train[label])
+auc = evaluate(clf, holdout[feature_cols], holdout[label], flip_guard=True)
 
----
+### SERVE (given brief)
+asof = compute_asof_aggregates(fa, year=brief.year, budget_bins=budget_bins)
+candidates = filter_by_brief(fa, brief)               # roles/seniority, genres, window, etc.
+candidates = build_features(candidates, shifted=True, asof=asof, budget_bins=budget_bins)
+p = clf.predict_proba(candidates[feature_cols])[:, 1]
+candidates["score"] = apply_constraints(p, candidates) # e.g., penalize big BFD, cadence extremes
+slate = rank_topN(candidates, N=brief.N)
+reasons = make_reason_codes(slate, features=["atr3", "bfd", "release_density", "genre_*"])
+return slate, reasons
+
 
 ## 3) Data & Features
 
