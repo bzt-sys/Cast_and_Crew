@@ -23,11 +23,6 @@ engaging with audiences more successfully per project.
 
 ## 2) System Architecture
 
-See `architecture.mmd` 
-
-
-```mermaid
-
 flowchart TB
   %% =============== INPUTS ===============
   subgraph Inputs
