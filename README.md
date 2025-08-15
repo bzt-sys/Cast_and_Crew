@@ -17,7 +17,9 @@ This project turns that problem into a **ranked slate** of actors plus:
 - **Reason codes** (top features driving each recommendation),
 - **Manifest** (parameters, timestamps, flags) for reproducibility.
 
-It’s designed as an **assistant** to reduce the search space, and eventually paired with a talent database that predicts similar audience reactions from lesser known persons, potentially cutting costs on budget, breaking new talent into the entertainment space, and 
+It’s designed as an **assistant** to reduce the search space; when paired with a deep talent database, a recommender could be built that predicts similar audience reactions from lesser known persons.
+
+This could be used to potentially cut costs on budget, breaking new talent into the entertainment space, and 
 engaging with audiences more successfully per project.
 ---
 
