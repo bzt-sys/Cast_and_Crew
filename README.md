@@ -62,7 +62,8 @@ flowchart LR
   B1 --> C1
   AR1 --> C1
   AR1 --> F2
-  C1 --> C2 --> F2 --> SC --> R1 --> SL --> EX```
+  C1 --> C2 --> F2 --> SC --> R1 --> SL --> EX
+  ```
 
 ### TRAIN
 fa = load_long_table()
