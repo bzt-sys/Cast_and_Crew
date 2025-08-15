@@ -32,12 +32,12 @@ flowchart LR
   %% ===== Offline / Training =====
   subgraph OFFLINE[Offline / Training]
     S1[Schema & QC]
-    J1[Join Director (optional)]
-    F1[Feature Builder (train): ATR3/DTR3, BFD, Release Density, Genre Aff, Year sin/cos, Bill Order]
-    T1{Temporal Split (TRAIN_CUTOFF_YEAR)}
-    Q1[Budget Bins (fit on train only)]
+    J1[Join Director - optional]
+    F1[Feature Builder - train: ATR3/DTR3, BFD, Release Density, Genre Aff, Year sin/cos, Bill Order]
+    T1{Temporal Split - TRAIN_CUTOFF_YEAR}
+    Q1[Budget Bins - fit on train only]
     M1[Train Classifier]
-    V1[Holdout Eval (AUC + flip guard)]
+    V1[Holdout Eval - AUC + flip guard]
     AR1[Artifacts]
   end
 
