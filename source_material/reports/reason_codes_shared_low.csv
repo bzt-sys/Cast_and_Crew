@@ -1,0 +1,2 @@
+actor_name,rc_1_feature,rc_1_delta,rc_1_value,rc_2_feature,rc_2_delta,rc_2_value,rc_3_feature,rc_3_delta,rc_3_value,rc_4_feature,rc_4_delta,rc_4_value,rc_5_feature,rc_5_delta,rc_5_value,rc_6_feature,rc_6_delta,rc_6_value,row
+Ryan Hurst,dtr3,0.3797663615115603,0.23030842216132552,year_cos,0.22874766205353864,1.0,budget,0.07785800648594843,20000000.0,bfd,0.04471757067528093,0.0,year_sin,0.04252146488025266,-2.4492935982947064e-16,genre_drama_aff,0.04079918855585951,0.0,Ryan Hurst

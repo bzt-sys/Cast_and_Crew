@@ -1,0 +1,2 @@
+actor_name,rc_1_feature,rc_1_delta,rc_1_value,rc_2_feature,rc_2_delta,rc_2_value,rc_3_feature,rc_3_delta,rc_3_value,rc_4_feature,rc_4_delta,rc_4_value,rc_5_feature,rc_5_delta,rc_5_value,rc_6_feature,rc_6_delta,rc_6_value,row
+Emmy Rossum,dtr3,0.2672257124430284,0.4428492950403994,budget,0.2607843183433203,100000000.0,bfd,0.03447334435568017,6.5,genre_comedy_aff,0.02116682928999125,0.0,genre_thriller_aff,0.014885007579367171,0.5,genre_drama_aff,0.007927700771450552,0.5,Emmy Rossum
